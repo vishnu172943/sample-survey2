@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MeetYourVA - Discovery Survey</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+
+    <style>
+        /* --- Global Styles & Variables --- */
+        :root {
+            --primary-color: #00e1ff; /* A vibrant teal/cyan */
+            --background-color: #121829;
+            --card-color: #1a2238;
+            --text-color: #f0f4f8;
+            --subtle-text-color: #9da9bb;
+            --input-bg-color: #2c3a5e;
+            --border-color: #4a5b82;
+            --success-color: #28a745;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem;
+            background-image: radial-gradient(circle at 1% 1%, var(--input-bg-color) 1px, transparent 1px),
+                              radial-gradient(circle at 99% 99%, var(--input-bg-color) 1px, transparent 1px);
+        }
+
+        /* --- Main Survey Container --- */
+        .survey-container {
+            width: 100%;
+            max-width: 700px;
+            background: var(--card-color);
+            border-radius: 20px;
+            padding: 2.5rem 3rem;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* --- Header --- */
+        .survey-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .survey-header h1 {
+            font-weight: 700;
+            font-size: 2.5rem;
+            background: -webkit-linear-gradient(45deg, var(--primary-color), #a200ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .survey-header p {
+            font-size: 1rem;
+            color: var(--subtle-text-color);
+            margin-top: 0.5rem;
+        }
+        
+        /* --- Progress Bar --- */
+        .progress-bar {
+            width: 100%;
+            background: var(--input-bg-color);
+            height: 8px;
+            border-radius: 10px;
+            margin-bottom: 2.5rem;
+            overflow: hidden;
+        }
+
+        .progress {
+            width: 0%;
+            height: 100%;
+            background: var(--primary-color);
+            border-radius: 10px;
+            transition: width 0.4s ease-in-out;
+        }
+        
+        /* --- Form Steps --- */
+        #survey-form {
+            position: relative;
+            min-height: 350px; /* Adjust as needed */
+        }
+        
+        .form-step {
+            position: absolute;
+            width: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(50px);
+            transition: opacity 0.4s ease-out, transform 0.4s ease-out, visibility 0.4s;
+        }
+
+        .form-step.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+        }
+        
+        /* --- Form Elements Styling --- */
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            background: var(--input-bg-color);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 15px rgba(0, 225, 255, 0.2);
+        }
+
+        /* Custom Radio & Checkbox */
+        .option-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .option {
+            background: var(--input-bg-color);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: border-color 0.3s, background-color 0.3s;
+        }
+        
+        .option:hover {
+            border-color: var(--primary-color);
+        }
+
+        .option input[type="radio"],
+        .option input[type="checkbox"] {
+            display: none; /* Hide default input */
+        }
+        
+        .option .custom-radio,
+        .option .custom-checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border-color);
+            border-radius: 50%; /* For radio */
+            margin-right: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: border-color 0.3s, background-color 0.3s;
+        }
+        
+        .option .custom-checkbox {
+            border-radius: 6px; /* For checkbox */
+        }
+        
+        .option input:checked + .custom-radio,
+        .option input:checked + .custom-checkbox {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .option .custom-radio::after {
+            content: '';
+            width: 12px;
+            height: 12px;
+            background: var(--card-color);
+            border-radius: 50%;
+            transform: scale(0);
+            transition: transform 0.3s ease;
+        }
+
+        .option input:checked + .custom-radio::after {
+            transform: scale(1);
+        }
+        
+        .option .custom-checkbox i {
+            font-size: 14px;
+            color: var(--card-color);
+            transform: scale(0);
+            transition: transform 0.3s ease;
+        }
+
+        .option input:checked + .custom-checkbox i {
+             transform: scale(1);
+        }
+
+        .option-label {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        
+        /* Range Slider */
+        .range-slider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .range-slider input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            background: var(--input-bg-color);
+            border-radius: 5px;
+            outline: none;
+        }
+        
+        .range-slider input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: var(--primary-color);
+            cursor: pointer;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(0, 225, 255, 0.5);
+        }
+        
+        #hours-output {
+            font-weight: 600;
+            background: var(--input-bg-color);
+            padding: 0.3rem 0.8rem;
+            border-radius: 6px;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        /* --- Navigation Buttons --- */
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2.5rem;
+        }
+
+        .btn {
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--background-color);
+        }
+
+        .btn-primary:hover {
+            background-color: #00b8d4;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: var(--input-bg-color);
+            color: var(--text-color);
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--border-color);
+        }
+        
+        /* --- Thank You Message --- */
+        .thank-you-message {
+            text-align: center;
+            display: none; /* Hidden by default */
+        }
+        
+        .thank-you-message h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .thank-you-message p {
+            color: var(--subtle-text-color);
+            margin-bottom: 2rem;
+        }
+
+        .checkmark-circle {
+            width: 100px;
+            height: 100px;
+            position: relative;
+            display: inline-block;
+            vertical-align: top;
+        }
+
+        .checkmark__circle {
+            stroke-dasharray: 166;
+            stroke-dashoffset: 166;
+            stroke-width: 4;
+            stroke-miterlimit: 10;
+            stroke: var(--success-color);
+            fill: none;
+            animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+        }
+        .checkmark {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: block;
+            stroke-width: 4;
+            stroke: #fff;
+            stroke-miterlimit: 10;
+            margin: 10% auto;
+            box-shadow: inset 0px 0px 0px var(--success-color);
+            animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+        }
+        .checkmark__check {
+            transform-origin: 50% 50%;
+            stroke-dasharray: 48;
+            stroke-dashoffset: 48;
+            stroke: var(--success-color);
+            animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+        }
+        @keyframes stroke {
+            100% { stroke-dashoffset: 0; }
+        }
+        @keyframes scale {
+            0%, 100% { transform: none; }
+            50% { transform: scale3d(1.1, 1.1, 1); }
+        }
+        @keyframes fill {
+            100% { box-shadow: inset 0px 0px 0px 50px var(--card-color); }
+        }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 768px) {
+            .survey-container {
+                padding: 2rem 1.5rem;
+            }
+            .survey-header h1 {
+                font-size: 2rem;
+            }
+            #survey-form {
+                min-height: 400px;
+            }
+            .option-group {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+    </style>
+</head>
+<body>
+
+    <div class="survey-container">
+        <div class="survey-header">
+            <h1>MeetYourVA</h1>
+            <p>Let's find the perfect Virtual Assistant for you!</p>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress"></div>
+        </div>
+
+        <form id="survey-form">
+            <!-- Step 1: Welcome & Name -->
+            <div class="form-step active">
+                <div class="form-group">
+                    <label for="name">To get started, what should we call you?</label>
+                    <input type="text" id="name" name="name" class="input-field" placeholder="e.g., Jane Doe" required>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn btn-primary btn-next">Next <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <!-- Step 2: Service Type -->
+            <div class="form-step">
+                <div class="form-group">
+                    <label>What kind of primary support are you looking for?</label>
+                    <div class="option-group">
+                        <label class="option">
+                            <input type="radio" name="service" value="admin" required>
+                            <span class="custom-radio"></span>
+                            <span class="option-label">Administrative Tasks</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="service" value="social_media">
+                            <span class="custom-radio"></span>
+                            <span class="option-label">Social Media Management</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="service" value="customer_support">
+                            <span class="custom-radio"></span>
+                            <span class="option-label">Customer Support</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="service" value="other">
+                            <span class="custom-radio"></span>
+                            <span class="option-label">Something Else</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn btn-secondary btn-prev"><i class="fas fa-arrow-left"></i> Previous</button>
+                    <button type="button" class="btn btn-primary btn-next">Next <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <!-- Step 3: Required Skills -->
+            <div class="form-step">
+                <div class="form-group">
+                    <label>Which skills are most important for your VA?</label>
+                    <div class="option-group">
+                        <label class="option">
+                            <input type="checkbox" name="skills" value="calendar">
+                            <span class="custom-checkbox"><i class="fas fa-check"></i></span>
+                            <span class="option-label">Calendar Management</span>
+                        </label>
+                        <label class="option">
+                            <input type="checkbox" name="skills" value="email">
+                            <span class="custom-checkbox"><i class="fas fa-check"></i></span>
+                            <span class="option-label">Email Handling</span>
+                        </label>
+                        <label class="option">
+                            <input type="checkbox" name="skills" value="bookkeeping">
+                            <span class="custom-checkbox"><i class="fas fa-check"></i></span>
+                            <span class="option-label">Basic Bookkeeping</span>
+                        </label>
+                         <label class="option">
+                            <input type="checkbox" name="skills" value="content">
+                            <span class="custom-checkbox"><i class="fas fa-check"></i></span>
+                            <span class="option-label">Content Creation</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn btn-secondary btn-prev"><i class="fas fa-arrow-left"></i> Previous</button>
+                    <button type="button" class="btn btn-primary btn-next">Next <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <!-- Step 4: Hours Per Week -->
+            <div class="form-step">
+                <div class="form-group">
+                    <label for="hours">How many hours per week do you anticipate needing assistance?</label>
+                    <div class="range-slider">
+                        <input type="range" id="hours" name="hours" class="input-field" min="5" max="40" value="10" step="5">
+                        <span id="hours-output">10</span>
+                    </div>
+                </div>
+                 <div class="button-group">
+                    <button type="button" class="btn btn-secondary btn-prev"><i class="fas fa-arrow-left"></i> Previous</button>
+                    <button type="button" class="btn btn-primary btn-next">Next <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+            
+            <!-- Step 5: Final Comments -->
+            <div class="form-step">
+                <div class="form-group">
+                    <label for="comments">Anything else we should know to find your perfect match?</label>
+                    <textarea id="comments" name="comments" class="input-field" rows="5" placeholder="Tell us about your business, specific tools you use, etc."></textarea>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn btn-secondary btn-prev"><i class="fas fa-arrow-left"></i> Previous</button>
+                    <button type="submit" class="btn btn-primary">Submit Survey</button>
+                </div>
+            </div>
+        </form>
+        
+        <!-- Thank You Message -->
+        <div class="thank-you-message">
+            <div class="checkmark-circle">
+                 <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                    <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
+                    <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                </svg>
+            </div>
+            <h2>Thank You!</h2>
+            <p>Your responses have been submitted. We'll be in touch shortly to connect you with your perfect VA.</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const formSteps = Array.from(document.querySelectorAll('.form-step'));
+            const nextButtons = document.querySelectorAll('.btn-next');
+            const prevButtons = document.querySelectorAll('.btn-prev');
+            const form = document.getElementById('survey-form');
+            const progressBar = document.querySelector('.progress');
+            const thankYouMessage = document.querySelector('.thank-you-message');
+
+            let currentStep = 0;
+
+            // Function to update progress bar and show correct step
+            const updateFormSteps = () => {
+                formSteps.forEach((step, index) => {
+                    step.classList.toggle('active', index === currentStep);
+                });
+
+                const progressPercent = (currentStep / (formSteps.length - 1)) * 100;
+                progressBar.style.width = `${progressPercent}%`;
+            };
+            
+            // --- EVENT LISTENERS ---
+
+            // "Next" button click
+            nextButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    if (validateStep(currentStep)) {
+                        currentStep++;
+                        if (currentStep < formSteps.length) {
+                            updateFormSteps();
+                        }
+                    }
+                });
+            });
+
+            // "Previous" button click
+            prevButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    currentStep--;
+                    if (currentStep >= 0) {
+                        updateFormSteps();
+                    }
+                });
+            });
+            
+            // Form submission
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                if (validateStep(currentStep)) {
+                    // Hide the form and show the thank you message
+                    form.style.display = 'none';
+                    document.querySelector('.progress-bar').style.display = 'none';
+                    thankYouMessage.style.display = 'block';
+
+                    // You can collect form data here
+                    const formData = new FormData(form);
+                    for (let [key, value] of formData.entries()) {
+                        console.log(`${key}: ${value}`);
+                    }
+                }
+            });
+
+            // Function to validate inputs on the current step
+            const validateStep = (stepIndex) => {
+                const currentStepElement = formSteps[stepIndex];
+                const inputs = currentStepElement.querySelectorAll('input[required], textarea[required]');
+                let isValid = true;
+                
+                inputs.forEach(input => {
+                    // Check for text/textarea
+                    if (input.type === 'text' || input.type === 'textarea') {
+                        if (input.value.trim() === '') {
+                            isValid = false;
+                        }
+                    }
+                    // Check for radio buttons
+                    if (input.type === 'radio') {
+                         const radioGroup = currentStepElement.querySelectorAll(`input[name="${input.name}"]`);
+                         if (!Array.from(radioGroup).some(radio => radio.checked)) {
+                             isValid = false;
+                         }
+                    }
+                });
+                
+                if (!isValid) {
+                    alert('Please fill out all required fields before proceeding.');
+                }
+                
+                return isValid;
+            };
+
+            // Range slider value display
+            const hoursInput = document.getElementById('hours');
+            const hoursOutput = document.getElementById('hours-output');
+            if (hoursInput) {
+                hoursInput.addEventListener('input', () => {
+                    hoursOutput.textContent = hoursInput.value;
+                });
+            }
+
+            // Initialize the form
+            updateFormSteps();
+        });
+    </script>
+
+</body>
+</html>
